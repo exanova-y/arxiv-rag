@@ -16,7 +16,6 @@ from rich.markdown import Markdown
 from build_index import fetch_arxiv_tool
 
 
-
 def download_pdf(pdf_url, output_file):
     response = requests.get(pdf_url)
     response.raise_for_status()
@@ -31,6 +30,7 @@ download_pdf_tool = FunctionTool.from_defaults(
     name='download_pdf_file_tool',
     description='python function, which downloads a pdf file by link'
 )
+
 
 # common set up.
 load_dotenv()
@@ -79,25 +79,3 @@ print("building a 'Reasoning and Acting' agent which has 3 tools")
 
 agent = ReActAgent(tools=[download_pdf_tool, rag_tool, fetch_arxiv_tool], llm=llm, verbose=True)
 ctx = Context(agent)
-
-# create a user-side prompt template to chat with an agent
-q_template = (
-    "I am interested in {topic}. \n"
-    "Find papers in your knowledge database related to this topic; use the following template to query research_paper_query_engine_tool tool: 'Provide title, summary, authors and link to download for papers related to {topic}'. If there are not, could you fetch the recent one from arXiv? \n"
-)
-
-async def run_agent():  
-    handler = agent.run(q_template.format(topic="Cybersecurity"))
-    # stream mode allows you to see thought processes and tool calls
-
-    # async for ev in handler.stream_events():
-    #     if isinstance(ev, ToolCallResult):
-    #         print(f"\nCall {ev.tool_name} with {ev.tool_kwargs}\nReturned: {ev.tool_output}")
-    #     if isinstance(ev, AgentStream):
-    #         print(f"{ev.delta}", end="", flush=True)
-    response = await handler
-    return response
-
-response = asyncio.run(run_agent()) # use asyncio to run.
-
-print(str(response))

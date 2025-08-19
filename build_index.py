@@ -41,7 +41,7 @@ def fetch_arxiv_papers(title :str, papers_count: int):
 
     return papers
 
-# wraps this python function for llama-index
+# wraps the function for llama-index
 fetch_arxiv_tool = FunctionTool.from_defaults(
     fetch_arxiv_papers,
     name='fetch_from_arxiv',
