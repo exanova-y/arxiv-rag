@@ -86,14 +86,15 @@ q_template = (
     "Find papers in your knowledge database related to this topic; use the following template to query research_paper_query_engine_tool tool: 'Provide title, summary, authors and link to download for papers related to {topic}'. If there are not, could you fetch the recent one from arXiv? \n"
 )
 
-handler = agent.run(q_template.format(topic="Cybersecurity"))
-
 async def run_agent():  
-    async for ev in handler.stream_events():
-        # if isinstance(ev, ToolCallResult):
-        #     print(f"\nCall {ev.tool_name} with {ev.tool_kwargs}\nReturned: {ev.tool_output}")
-        if isinstance(ev, AgentStream):
-            print(f"{ev.delta}", end="", flush=True)
+    handler = agent.run(q_template.format(topic="Cybersecurity"))
+    # stream mode allows you to see thought processes and tool calls
+
+    # async for ev in handler.stream_events():
+    #     if isinstance(ev, ToolCallResult):
+    #         print(f"\nCall {ev.tool_name} with {ev.tool_kwargs}\nReturned: {ev.tool_output}")
+    #     if isinstance(ev, AgentStream):
+    #         print(f"{ev.delta}", end="", flush=True)
     response = await handler
     return response
 
