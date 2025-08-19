@@ -40,7 +40,14 @@ def fetch_arxiv_papers(title :str, papers_count: int):
         papers.append(paper_info)
 
     return papers
-    
+
+# wraps this python function for llama-index
+fetch_arxiv_tool = FunctionTool.from_defaults(
+    fetch_arxiv_papers,
+    name='fetch_from_arxiv',
+    description='download the {max_results} recent papers regarding the topic {title} from arxiv' 
+)
+
 def create_documents_from_papers(papers):
     documents = []
     for paper in papers:
