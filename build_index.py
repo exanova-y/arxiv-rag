@@ -2,8 +2,10 @@ import arxiv
 from llama_index.llms.mistralai import MistralAI
 from llama_index.embeddings.mistralai import MistralAIEmbedding
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Document, StorageContext, load_index_from_storage, PromptTemplate, Settings
+from llama_index.core.tools import FunctionTool, QueryEngineTool
 import os
 from dotenv import load_dotenv
+
 
 # define paper download
 def fetch_arxiv_papers(title :str, papers_count: int):
@@ -78,7 +80,7 @@ index = VectorStoreIndex.from_documents(documents, embed_model=embed_model)
 # store the index to avoid re-indexing. 
 # for now, just store thtese indices locally inside a dir.
 print("storing indices")
-index.storage_context.persist('index/')
+index.storage_context.persist('index/') # saves indices locally
 storage_context = StorageContext.from_defaults(persist_dir='index/')
 index = load_index_from_storage(storage_context, embed_model=embed_model)
 print(index)
