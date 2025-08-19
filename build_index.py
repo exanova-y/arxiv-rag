@@ -65,29 +65,31 @@ def create_documents_from_papers(papers):
     return documents
 
 
-print("loading environment variables...")
-load_dotenv()
-mistral_api_key = os.getenv("MISTRAL_API_KEY")
-llm = MistralAI(api_key=mistral_api_key, model='mistral-large-latest')
+# Only execute when run directly, not when imported
+if __name__ == "__main__":
+    print("loading environment variables...")
+    load_dotenv()
+    mistral_api_key = os.getenv("MISTRAL_API_KEY")
+    llm = MistralAI(api_key=mistral_api_key, model='mistral-large-latest')
 
-model_name = "mistral-embed"
-embed_model = MistralAIEmbedding(model_name=model_name, api_key=mistral_api_key)
-print("llm and embedding model set up.")
+    model_name = "mistral-embed"
+    embed_model = MistralAIEmbedding(model_name=model_name, api_key=mistral_api_key)
+    print("llm and embedding model set up.")
 
-papers = fetch_arxiv_papers("cybersecurity", 3)
-documents = create_documents_from_papers(papers)
-print("documents created.")
-print([[p['title']] for p in papers])
+    papers = fetch_arxiv_papers("cybersecurity OR IT security OR infosec OR network security", 50)
+    documents = create_documents_from_papers(papers)
+    print("documents created.")
+    print([[p['title']] for p in papers])
 
-print("definiing chunk settings")
-Settings.chunk_size = 1024 # the specified maximum num characters per text chunk
-Settings.chunk_overlap = 50 # (specified) maximum num characters of overlap between chunks
-index = VectorStoreIndex.from_documents(documents, embed_model=embed_model)
+    print("definiing chunk settings")
+    Settings.chunk_size = 1024 # the specified maximum num characters per text chunk
+    Settings.chunk_overlap = 50 # (specified) maximum num characters of overlap between chunks
+    index = VectorStoreIndex.from_documents(documents, embed_model=embed_model)
 
-# store the index to avoid re-indexing. 
-# for now, just store thtese indices locally inside a dir.
-print("storing indices")
-index.storage_context.persist('index/') # saves indices locally
-storage_context = StorageContext.from_defaults(persist_dir='index/')
-index = load_index_from_storage(storage_context, embed_model=embed_model)
-print(index)
+    # store the index to avoid re-indexing. 
+    # for now, just store thtese indices locally inside a dir.
+    print("storing indices")
+    index.storage_context.persist('index/') # saves indices locally
+    storage_context = StorageContext.from_defaults(persist_dir='index/')
+    index = load_index_from_storage(storage_context, embed_model=embed_model)
+    print(index)
