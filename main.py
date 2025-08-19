@@ -1,6 +1,7 @@
 import arxiv
 from llama_index.llms.mistralai import MistralAI
 from llama_index.embeddings.mistralai import MistralAIEmbedding
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Document, StorageContext, load_index_from_storage, PromptTemplate, Settings
 import os
 from dotenv import load_dotenv
 
@@ -66,3 +67,18 @@ print("llm and embedding model set up.")
 
 papers = fetch_arxiv_papers("cybersecurity", 3)
 documents = create_documents_from_papers(papers)
+print("documents created.")
+print([[p['title']] for p in papers])
+
+print("definiing chunk settings")
+Settings.chunk_size = 1024 # the specified maximum num characters per text chunk
+Settings.chunk_overlap = 50 # (specified) maximum num characters of overlap between chunks
+index = VectorStoreIndex.from_documents(documents, embed_model=embed_model)
+
+# store the index to avoid re-indexing. 
+# for now, just store thtese indices locally inside a dir.
+print("storing indices")
+index.storage_context.persist('index/')
+storage_context = StorageContext.from_defaults(persist_dir='index/')
+index = load_index_from_storage(storage_context, embed_model=embed_model)
+print(index)
