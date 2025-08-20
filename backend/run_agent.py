@@ -27,15 +27,17 @@ async def run_agent(topic: str, query_template: str, stream: bool = False):
 
 async def main():
     #print("testing standard query.")
-    #response = await run_agent("cybersecurity", q_template) # use await when there are multiple async calls
+    #print("user: information security")
+    #response = await run_agent("information security", q_template) # use await when there are multiple async calls
     #follow_up = await run_agent("cybersecurity", "can you provide papers relating to scam calls?")
     
     # refine query doesn't require a previous prompt
     print("testing refine query.")
-    response = await run_agent("cybersecurity", "these papers are not interesting enough. can you provide the latest information security papers? use the research_paper_refine_tool", stream=True)
+    print("user: these papers are not interesting enough. can you provide the latest most interesting security papers? use the research_paper_refine_tool")
+    refined_response = await run_agent("information security", "these papers are not interesting enough. can you provide the latest most interesting security papers? use the research_paper_refine_tool", stream=True)
     
     #response2 = await run_agent("african elephants") # something irrelevant to test refinement functions
-    print(str(response))
+    #print(str(response))
 
 
 asyncio.run(main()) # asyncio can only be used once I think
