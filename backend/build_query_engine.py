@@ -6,15 +6,15 @@ from llama_index.core.tools import FunctionTool, QueryEngineTool
 from llama_index.core.agent.workflow import ReActAgent # the import source has changed
 from llama_index.core.workflow import Context
 
-import os 
-import requests
+import os
+from pathlib import Path
 from dotenv import load_dotenv
 import asyncio
 
 from rich.console import Console
 from rich.markdown import Markdown
 
-from build_index import fetch_arxiv_tool
+from .build_index import fetch_arxiv_tool
 
 def download_pdf(pdf_url, output_file):
     response = requests.get(pdf_url)
@@ -49,9 +49,21 @@ llm = MistralAI(api_key=mistral_api_key, model='mistral-large-latest')
 model_name = "mistral-embed"
 embed_model = MistralAIEmbedding(model_name=model_name, api_key=mistral_api_key)
 
+
 print("loading index")
-storage_context = StorageContext.from_defaults(persist_dir='index/')
+
+# Uncomment to use local index
+# Use relative path from current file location
+current_dir = Path(__file__).parent
+index_dir = current_dir.parent / 'index'
+storage_context = StorageContext.from_defaults(persist_dir=str(index_dir))
 index = load_index_from_storage(storage_context, embed_model=embed_model)
+
+# # Or, use PostgreSQL
+# storage_context = StorageContext.from_defaults(vector_store=vector_store)
+# index = VectorStoreIndex.from_vector_store(vector_store=vector_store, embed_model=embed_model)
+
+
 
 print("building query engine")
 query_engine = index.as_query_engine(llm=llm, similarity_top_k=5)

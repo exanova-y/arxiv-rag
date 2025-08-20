@@ -1,5 +1,5 @@
 import asyncio  
-from build_query_engine import fetch_arxiv_tool, rag_tool, rag_tool_refine, download_pdf_tool, llm, agent, ctx
+from .build_query_engine import fetch_arxiv_tool, rag_tool, rag_tool_refine, download_pdf_tool, llm, agent, ctx
 
 from llama_index.core.agent.workflow import ReActAgent, AgentStream, ToolCallResult
 from llama_index.core.workflow import Context
@@ -40,4 +40,7 @@ async def main():
     #print(str(response))
 
 
-asyncio.run(main()) # asyncio can only be used once I think
+# Remove asyncio.run() - this was causing the event loop conflict
+# The main() function can be called directly if needed for testing:
+if __name__ == "__main__":
+    asyncio.run(main()) # asyncio could only be called once!!

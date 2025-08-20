@@ -1,3 +1,4 @@
+# separately from main, you can run this to test assistant
 import requests
 import time
 

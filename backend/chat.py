@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 
 from .server_sent_events import SSEStreamResponse, get_text
+from .run_agent import run_agent, q_template
 
 router = APIRouter(prefix="/chat")
 
@@ -15,9 +16,7 @@ async def chat(request: Request) -> StreamingResponse:
     
     query_text = f'User query: "{content}".\n'
     
-    # Simple automated response
-    sample_parts = [
-        "this is an automated message"
-    ]
-
-    return SSEStreamResponse(parts=sample_parts, query=query_text)
+    # run agent (remember, it's async) and get response
+    response = await run_agent(content, q_template, stream=True)
+    
+    return SSEStreamResponse(parts=[str(response)], query=query_text)

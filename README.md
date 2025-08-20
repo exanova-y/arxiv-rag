@@ -1,5 +1,9 @@
-(to be updated)
+Pre-requisites:
+- PostgreSQL
+- pgvector
+on mac, you can use brew to install the above.
 
+(to be updated)
 
 
 Process
