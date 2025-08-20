@@ -1,3 +1,8 @@
+@import "tailwindcss";
+
+/* Include LlamaIndex Chat UI components for Tailwind v4 */
+@source '../node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}';
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
