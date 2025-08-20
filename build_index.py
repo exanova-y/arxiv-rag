@@ -76,12 +76,13 @@ if __name__ == "__main__":
     embed_model = MistralAIEmbedding(model_name=model_name, api_key=mistral_api_key)
     print("llm and embedding model set up.")
 
-    papers = fetch_arxiv_papers("cybersecurity OR IT security OR infosec OR network security", 50)
+    papers = fetch_arxiv_papers("information security", 50)
+    print("number of papers fetched:", len(papers))
     documents = create_documents_from_papers(papers)
     print("documents created.")
     print([[p['title']] for p in papers])
 
-    print("definiing chunk settings")
+    print("defining chunk settings")
     Settings.chunk_size = 1024 # the specified maximum num characters per text chunk
     Settings.chunk_overlap = 50 # (specified) maximum num characters of overlap between chunks
     index = VectorStoreIndex.from_documents(documents, embed_model=embed_model)

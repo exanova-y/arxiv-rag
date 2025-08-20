@@ -1,8 +1,9 @@
 import asyncio  
-from build_query_engine import setup_query_engine, fetch_arxiv_tool, rag_tool, download_pdf_tool, llm
+from build_query_engine import fetch_arxiv_tool, rag_tool, download_pdf_tool, llm, agent, ctx
 
 from llama_index.core.agent.workflow import ReActAgent
 from llama_index.core.workflow import Context
+from llama_index.core.response_synthesizers import Refine
 
 # create a user-side prompt template to chat with an agent
 q_template = (
@@ -15,8 +16,8 @@ print("building a 'Reasoning and Acting' agent which has 3 tools")
 # Acting: If the agent decides to use a tool, it executes the tool and then returns to the Reasoning stage to determine whether it can now answer the query or if further tool usage is necessary.
 
 
-async def run_agent(topic: str):  
-    handler = agent.run(q_template.format(topic=topic))
+async def run_agent(topic: str, query_template: str):  
+    handler = agent.run(query_template.format(topic=topic))
     # stream mode allows you to see thought processes and tool calls
 
     # async for ev in handler.stream_events():
@@ -28,10 +29,17 @@ async def run_agent(topic: str):
     return response
 
 async def main():
-    response = await run_agent("cybersecurity") # use await when there are multiple async calls
-    response2 = await run_agent("african elephants") # something irrelevant to test refinement functions
+    response = await run_agent("cybersecurity", q_template) # use await when there are multiple async calls
+    #follow_up = await run_agent("cybersecurity", "can you provide papers relating to scam calls?")
+
+
+    
+    new_agent_session = await run_agent("cybersecurity", "these papers are not interesting enough. can you provide more papers that discuss scam calls?")
+    
+    
+    #response2 = await run_agent("african elephants") # something irrelevant to test refinement functions
     print(str(response))
-    print(str(response2))
+    print(str(new_agent_session))
 
 
 asyncio.run(main()) # asyncio can only be used once I think
