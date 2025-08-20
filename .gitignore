@@ -1,4 +1,18 @@
+# root level gitignore can override nested directory ones
+
 .env
 .venv
 __pycache__
 /index
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.log
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

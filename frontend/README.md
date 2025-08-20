@@ -2,9 +2,9 @@
 
 Libraries: https://github.com/run-llama/chat-ui
 
-npm install @llamaindex/chat-ui
-npm add -D tailwindcss postcss autoprefixer
-
+npm i @llamaindex/chat-ui
+npm i @ai-sdk/react
+npm i -D tailwindcss postcss autoprefixer
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
