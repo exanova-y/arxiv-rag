@@ -1,20 +1,16 @@
 import { useState } from 'react'
 import { ChatSection } from '@llamaindex/chat-ui'
-import { useChat } from '@ai-sdk/react'
+import { useChat } from '@ai-sdk/react' // useChat hook from vercel/ai
+import MyChat from './myChat'
 import './App.css'
 
+
 function App() {
-  const ChatExample = () => {
-    const handler = useChat()
-    return <ChatSection handler={handler} />
-  }
   return (
-    <>
-      <div>
-        <ChatExample />
-      </div> 
-    </>
+    <div>
+      <MyChat />
+    </div>
   )
 }
 
-export default App
+export default App;
