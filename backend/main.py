@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from chat import router as chat_router
+from .chat import router as chat_router
 
 app = FastAPI()
 app.include_router(chat_router, prefix="/api")
