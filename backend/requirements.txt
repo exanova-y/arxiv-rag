@@ -2,3 +2,8 @@ arxiv
 llama-index
 llama-index-embeddings-mistralai
 llama-index-llms-mistralai
+
+uuid
+typing
+fastapi
+uvicorn
