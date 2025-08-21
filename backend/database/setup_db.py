@@ -1,3 +1,6 @@
+# note: this script includes one additional step, which is converting embeddings into rows rather than text to rows. this results in unreadable data. 
+# run build_index.py to directly convert paper text into rows.
+
 from llama_index.core import SimpleDirectoryReader, StorageContext
 from llama_index.core import VectorStoreIndex
 from llama_index.vector_stores.postgres import PGVectorStore
@@ -51,7 +54,7 @@ index_path = "../../index"  # Simple relative path
 documents = SimpleDirectoryReader(index_path).load_data()
 print(f"Loaded {len(documents)} documents")
 
-# Enable pgvector extension first
+# this seems duplicated, may delete soon.
 conn_db = psycopg2.connect(f"{connection_string}/{db_name}")
 conn_db.autocommit = True
 with conn_db.cursor() as c:
