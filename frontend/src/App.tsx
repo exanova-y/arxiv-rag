@@ -52,7 +52,7 @@ export default function App(): JSX.Element {
 function ChatExample() {
   const handler = useChat<MyUIMessage>({
     transport: new DefaultChatTransport({
-      api: 'http://localhost:8000/api/chat',
+      api: 'https://arxiv-rag-production.up.railway.app/',
     }),
     messages: initialMessages,
     onFinish: ({ message }) => {

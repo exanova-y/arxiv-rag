@@ -2,17 +2,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from chat import router as chat_router
+import dotenv
 
 app = FastAPI()
 app.include_router(chat_router, prefix="/api")
 
-origins = ["http://localhost", "http://localhost:5173", "http://127.0.0.1:5173"]
+origins = ["http://localhost", "http://localhost:5173", "http://127.0.0.1:5173", "https://arxiv-rag-front-production.up.railway.app"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # You can specify allowed origins here
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    
 )
 
 # http://127.0.0.1:8000/
@@ -25,4 +27,4 @@ if __name__ == "__main__":
     load_dotenv()
     port = os.getenv("PORT")
     # Local dev when cwd is backend/: python main.py
-    uvicorn.run("main:app", host="127.0.0.1", port=port, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
