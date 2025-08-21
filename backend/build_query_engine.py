@@ -58,7 +58,7 @@ print("loading index")
 
 # Use PostgreSQL PGVectorStore only
 db_url = os.getenv("DATABASE_URL")
-url = make_url(connection_string)
+url = make_url(db_url)
 
 if not db_name:
     db_name = url.database or "arxiv_rag"
