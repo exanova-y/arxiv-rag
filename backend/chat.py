@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 
-from .server_sent_events import SSEStreamResponse, get_text
-from .run_agent import run_agent, q_template
+# absolute
+from backend.server_sent_events import SSEStreamResponse, get_text
+from backend.run_agent import run_agent, q_template
 
 import time
 

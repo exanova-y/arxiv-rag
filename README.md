@@ -38,7 +38,7 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 Database setup
 
 The 'arxiv_rag' db contains these tables:
-- data_arxiv_papers
+- data_arxiv_papers (contains 255 documents or rows)
 - chat_store 
 - chat metadata tables
 

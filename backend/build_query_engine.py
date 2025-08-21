@@ -15,8 +15,9 @@ import requests
 from rich.console import Console
 from rich.markdown import Markdown
 
-from .build_index import fetch_arxiv_tool
-from .database.setup_chat_storage import chat_memory
+# absolute imports
+from backend.build_index import fetch_arxiv_tool
+from backend.database.setup_chat_storage import chat_memory
 
 def download_pdf(pdf_url, output_file):
     response = requests.get(pdf_url)
