@@ -69,7 +69,6 @@ def create_documents_from_papers(papers):
     return documents
 
 
-# Only execute when run directly, not when imported
 if __name__ == "__main__":
     print("loading environment variables...")
     load_dotenv()
@@ -80,17 +79,26 @@ if __name__ == "__main__":
     embed_model = MistralAIEmbedding(model_name=model_name, api_key=mistral_api_key)
     print("llm and embedding model set up.")
 
-    # paper_categories = ["computer vision", "machine learning", "software engineering", "information security", "data science"]
-    # for category in paper_categories:
-    #     papers = fetch_arxiv_papers(category, 50)
-    #     documents = create_documents_from_papers(papers)
-    #     print(f"number of papers fetched for {category}: {len(papers)}")
-    papers = fetch_arxiv_papers("computer vision", 5)
-    documents = create_documents_from_papers(papers)
-    print(f"number of papers fetched for computer vision: {len(papers)}")
+    paper_categories = ["computer vision", "machine learning", "software engineering", "information security", "data science"]
+    all_documents = []
+    all_papers = []
+    
+    for category in paper_categories:
+        papers = fetch_arxiv_papers(category, 50)
+        documents = create_documents_from_papers(papers)
+        all_documents.extend(documents)
+        all_papers.extend(papers)
+        print(f"number of papers fetched for {category}: {len(papers)}")
+
+    print(f"Total papers collected: {len(all_papers)}")
+    
+    # uncomment to download single-category paper
+    # papers = fetch_arxiv_papers("computer vision", 5)
+    # documents = create_documents_from_papers(papers)
+    # print(f"number of papers fetched for computer vision: {len(papers)}")
 
     print("documents created.")
-    print([[p['title']] for p in papers])
+    print([[p['title']] for p in all_papers])
 
     print("defining chunk settings")
     Settings.chunk_size = 1024 # the specified maximum num characters per text chunk
@@ -119,8 +127,8 @@ if __name__ == "__main__":
     )
 
     print("creating postgresql index")
-    storage_context = StorageContext.from_defaults(vector_store=vector_store)
-    index = VectorStoreIndex.from_documents(documents, storage_context=storage_context, embed_model=embed_model, show_progress=True)
+    storage_context = StorageContext.from_defaults(vector_store=vector_store) # creates a context with vector_store configs.
+    index = VectorStoreIndex.from_documents(all_documents, storage_context=storage_context, embed_model=embed_model, show_progress=True) # creates the actual vector index from docs
     
 
     # uncomment to use local storage

@@ -4,11 +4,14 @@ from fastapi.responses import StreamingResponse
 from .server_sent_events import SSEStreamResponse, get_text
 from .run_agent import run_agent, q_template
 
+import time
+
 router = APIRouter(prefix="/chat")
 
 @router.post("/")
 async def chat(request: Request) -> StreamingResponse:
     print("received POST request to /api/chat/")
+    
     data = await request.json()
     messages = data.get("messages", [])
     last_message = messages[-1] if messages else {}
@@ -17,6 +20,12 @@ async def chat(request: Request) -> StreamingResponse:
     query_text = f'User query: "{content}".\n'
     
     # run agent (remember, it's async) and get response
+    agent_start = time.time()
     response = await run_agent(content, q_template, stream=True)
+    agent_end = time.time()
+    
+    total_time = agent_end - agent_start
+    
+    print("Time taken:", total_time)
     
     return SSEStreamResponse(parts=[str(response)], query=query_text)

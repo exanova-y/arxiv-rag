@@ -1,6 +1,6 @@
 import pandas as pd
 from tabulate import tabulate
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 # Create SQLAlchemy engine
 engine = create_engine("postgresql://postgres:password@localhost:5432/arxiv_rag")
@@ -22,6 +22,25 @@ print("PostgreSQL Table: data_arxiv_papers (First 5 rows)")
 print("=" * 120)
 print(tabulate(df, headers='keys', tablefmt='grid', showindex=False, 
                maxcolwidths=[4, 60, 40, 36, 30]))
+
+# Function to remove last 50 rows (data science duplicates)
+def remove_last_50_rows():
+    delete_query = """
+    DELETE FROM data_arxiv_papers 
+    WHERE id IN (
+        SELECT id FROM data_arxiv_papers 
+        ORDER BY id DESC 
+        LIMIT 50
+    );
+    """
+    
+    with engine.connect() as conn:
+        result = conn.execute(text(delete_query))
+        conn.commit()
+        print(f"Deleted {result.rowcount} rows (last 50 entries)")
+
+# Uncomment to remove duplicates:
+remove_last_50_rows()
 
 # Show table stats
 stats_query = """
