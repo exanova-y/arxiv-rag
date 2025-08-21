@@ -1,8 +1,10 @@
 import os
+import dotenv
 from llama_index.storage.chat_store.postgres import PostgresChatStore
 from llama_index.core.memory import ChatMemoryBuffer
 
 # Grab from environment
+dotenv.load_dotenv()
 db_url = os.getenv("DATABASE_URL")
 
 # Railway sometimes gives "postgres://", but SQLAlchemy / asyncpg need "postgresql+asyncpg://"
