@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from backend.chat import router as chat_router # use absolute
+from chat import router as chat_router
 
 app = FastAPI()
 app.include_router(chat_router, prefix="/api")
@@ -22,7 +22,5 @@ def root():
 
 
 if __name__ == "__main__":
-    # local dev: python -m backend.main
-
-    # use absolute
-    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)
+    # Local dev when cwd is backend/: python main.py
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
