@@ -15,15 +15,17 @@ To be added
 **Database:**
 - setup_chat_storage.py
 - setup_paper_storage.py
-- query_db.py
+- query_db.py - it can also display the tables in the terminal.
 
 Database setup
-```
-arxiv_rag/
-├── data_arxiv_papers (papers table)
-├── chat_store (conversation messages)  
-└── chat metadata tables
-```
+
+The 'arxiv_rag' db contains these tables:
+- data_arxiv_papers
+- chat_store 
+- chat metadata tables
+
+![](papers.png)
+![](chatstore.png)
 
 **Endpoint-relevant:**
 - main.py - the FastAPI app, mounts /api/chat/
