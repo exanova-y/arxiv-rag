@@ -5,6 +5,8 @@ from llama_index.core.agent.workflow import ReActAgent, AgentStream, ToolCallRes
 from llama_index.core.workflow import Context
 from llama_index.core.response_synthesizers import Refine
 
+from .database.setup_chat_storage import chat_memory
+
 # create a user-side prompt template to chat with an agent
 q_template = (
     "I am interested in {topic}. \n"
@@ -13,7 +15,7 @@ q_template = (
 
 # I needed to wrap the code in an async function to run
 async def run_agent(topic: str, query_template: str, stream: bool = False):  
-    handler = agent.run(query_template.format(topic=topic))
+    handler = agent.run(query_template.format(topic=topic), memory=chat_memory)
     if stream:
         # stream mode allows you to see thought processes and tool calls
         async for ev in handler.stream_events():

@@ -40,9 +40,9 @@ def remove_last_50_rows():
         print(f"Deleted {result.rowcount} rows (last 50 entries)")
 
 # Uncomment to remove duplicates:
-remove_last_50_rows()
+# remove_last_50_rows()
 
-# Show table stats
+# Show table stats for papers
 stats_query = """
 SELECT 
     COUNT(*) as total_rows,
@@ -58,3 +58,26 @@ print("\nTable Statistics:")
 print("=" * 40)
 print(tabulate(stats_df, headers='keys', tablefmt='fancy_grid', showindex=False))
 
+# use %% to fix immutable data type error from sqlalchemy
+chat_table_check_query = """
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_name LIKE '%%chat%%'; 
+"""
+
+tables_df = pd.read_sql_query(chat_table_check_query, engine)
+tables_df.columns = tables_df.columns.astype(str)
+print("Chat tables found:")
+print(tabulate(tables_df, headers='keys', tablefmt='grid', showindex=False))
+
+for table_name in tables_df['table_name']:
+    print(f"\n--- {table_name.upper()} ---")
+    chat_query = f"SELECT * FROM {table_name} LIMIT 5;"
+    chat_df = pd.read_sql_query(chat_query, engine)
+    if not chat_df.empty:
+        print(tabulate(chat_df, headers='keys', tablefmt='grid', showindex=False))
+    else:
+        print("No data in table")
+        
+   

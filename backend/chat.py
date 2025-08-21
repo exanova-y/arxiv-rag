@@ -18,14 +18,20 @@ async def chat(request: Request) -> StreamingResponse:
     content = get_text(last_message)
     
     query_text = f'User query: "{content}".\n'
-    
-    # run agent (remember, it's async) and get response
     agent_start = time.time()
-    response = await run_agent(content, q_template, stream=True)
-    agent_end = time.time()
+
+    # using try/except as the error status won't be sent to the endpoint.
+    try:
+        # run agent (remember, it's async) and get response
+        response = await run_agent(content, q_template, stream=True)
+        agent_end = time.time()
+        total_time = agent_end - agent_start
+        print("Time taken:", total_time)
+        return SSEStreamResponse(parts=[str(response)], query=query_text)
     
-    total_time = agent_end - agent_start
-    
-    print("Time taken:", total_time)
-    
-    return SSEStreamResponse(parts=[str(response)], query=query_text)
+    except Exception as e:    
+        if "429" in str(e):
+            fallback_response = "⚠️ The server is busy. Please try again in a few seconds."
+        else:
+            fallback_response = "❌ Something went wrong. Please try again."
+        return SSEStreamResponse(parts=[fallback_response], query=query_text)
