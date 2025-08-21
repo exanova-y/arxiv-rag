@@ -58,10 +58,8 @@ print("loading index")
 
 # Use PostgreSQL PGVectorStore only
 db_url = os.getenv("DATABASE_URL")
+db_name = 'arxiv_rag'
 url = make_url(db_url)
-
-if not db_name:
-    db_name = url.database or "arxiv_rag"
 
 table_name = os.getenv("PGVECTOR_TABLE", "arxiv_papers")
 print(f"Using PGVector table: {table_name} on {url.host}:{url.port}/{db_name}")
