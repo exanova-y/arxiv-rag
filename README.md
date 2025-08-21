@@ -3,9 +3,6 @@
 Architecture:
 ![](architecture.png)
 
-Screenshot:
-![](example.png)
-
 ### Setup
 To be added
 
@@ -18,19 +15,15 @@ To be added
 **Database:**
 - setup_chat_storage.py
 - setup_paper_storage.py
-- query_db.py - this also displays the two tables in the terminal
+- query_db.py
 
-Database setup:   
-
-The 'arxiv_rag' database contains the following tables:
-- data_arxiv_papers (papers table)
-- chat_store (conversation messages)  
-- chat metadata tables
-
-Images:
-![](papers.png)
-![](chatstore.png)
-
+Database setup
+```
+arxiv_rag/
+├── data_arxiv_papers (papers table)
+├── chat_store (conversation messages)  
+└── chat metadata tables
+```
 
 **Endpoint-relevant:**
 - main.py - the FastAPI app, mounts /api/chat/
@@ -38,12 +31,13 @@ Images:
 - test_agent.py - testing agent
 
 ### Frontend
-Vite React Typescript and Tailwind app, uses llamaindex's chat-ui.
+Vite React Typescript and Tailwind app, uses llamaindex's chat-ui
 
 
 ### Limitations
-- Using the Mistral model, there is a limit of 1 request per second, which can result in frequent 429 errors. On the backend inside chat.py, a try/except block is used to catch these errors and return a fallback response. No detection is needed on frontend. Need to install llama-index-llms-anthropic for claude support.
+- Using the Mistral model, there is a limit of 1 request per second, which can result in frequent 429 errors. On the backend inside chat.py, a try/except block is used to catch these errors and return a fallback response. No detection is needed on frontend.Need to install llama-index-llms-anthropic for claude support
 - UI: the user can't yet manually select refine or standard modes
+
 
 ### Random notes
 - Build index stores papers inside index. the important files are docstore.json, where you can roughly estimate how many papers there are.
