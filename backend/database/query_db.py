@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, text
 # Create SQLAlchemy engine
 engine = create_engine("postgresql://postgres:password@localhost:5432/arxiv_rag")
 
+# section 1: paper storage
 # Query first 5 rows with all original columns
 query = """
 SELECT 
@@ -54,30 +55,41 @@ FROM data_arxiv_papers;
 """
 
 stats_df = pd.read_sql_query(stats_query, engine)
-print("\nTable Statistics:")
+print("Table Statistics:")
 print("=" * 40)
 print(tabulate(stats_df, headers='keys', tablefmt='fancy_grid', showindex=False))
 
-# use %% to fix immutable data type error from sqlalchemy
-chat_table_check_query = """
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
-AND table_name LIKE '%%chat%%'; 
-"""
 
-tables_df = pd.read_sql_query(chat_table_check_query, engine)
-tables_df.columns = tables_df.columns.astype(str)
-print("Chat tables found:")
-print(tabulate(tables_df, headers='keys', tablefmt='grid', showindex=False))
 
-for table_name in tables_df['table_name']:
-    print(f"\n--- {table_name.upper()} ---")
-    chat_query = f"SELECT * FROM {table_name} LIMIT 5;"
-    chat_df = pd.read_sql_query(chat_query, engine)
-    if not chat_df.empty:
-        print(tabulate(chat_df, headers='keys', tablefmt='grid', showindex=False))
-    else:
-        print("No data in table")
-        
-   
+# section 2: chat storage
+# LlamaIndex PostgresChatStore
+chat_table = "data_chatstore"
+print(f"postgres chatstore table: {chat_table}")
+
+# table stats
+stats_chat_df = pd.read_sql_query(
+    """
+    SELECT
+        COUNT(*) AS total_rows,
+        COUNT(DISTINCT key) AS distinct_keys,
+        MIN(id) AS min_id,
+        MAX(id) AS max_id
+    FROM data_chatstore;
+    """,
+    engine,
+)
+print("Table Statistics (chat):")
+print(tabulate(stats_chat_df, headers='keys', tablefmt='fancy_grid', showindex=False))
+
+# display a specific row (id=1) with all columns
+row1_df = pd.read_sql_query(
+    """
+    SELECT *
+    FROM data_chatstore
+    WHERE id = 1;
+    """,
+    engine,
+)
+if not row1_df.empty:
+    print("\nSingle row (id=1):")
+    print(tabulate(row1_df, headers='keys', tablefmt='grid', showindex=False, maxcolwidths=[12, 24, 120]))
