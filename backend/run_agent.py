@@ -1,9 +1,11 @@
 import asyncio  
-from build_query_engine import fetch_arxiv_tool, rag_tool, rag_tool_refine, download_pdf_tool, llm, agent, ctx
+from .build_query_engine import fetch_arxiv_tool, rag_tool, rag_tool_refine, download_pdf_tool, llm, agent, ctx
 
 from llama_index.core.agent.workflow import ReActAgent, AgentStream, ToolCallResult
 from llama_index.core.workflow import Context
 from llama_index.core.response_synthesizers import Refine
+
+from .database.setup_chat_storage import chat_memory
 
 # create a user-side prompt template to chat with an agent
 q_template = (
@@ -13,7 +15,7 @@ q_template = (
 
 # I needed to wrap the code in an async function to run
 async def run_agent(topic: str, query_template: str, stream: bool = False):  
-    handler = agent.run(query_template.format(topic=topic))
+    handler = agent.run(query_template.format(topic=topic), memory=chat_memory)
     if stream:
         # stream mode allows you to see thought processes and tool calls
         async for ev in handler.stream_events():
@@ -27,15 +29,20 @@ async def run_agent(topic: str, query_template: str, stream: bool = False):
 
 async def main():
     #print("testing standard query.")
-    #response = await run_agent("cybersecurity", q_template) # use await when there are multiple async calls
+    #print("user: information security")
+    #response = await run_agent("information security", q_template) # use await when there are multiple async calls
     #follow_up = await run_agent("cybersecurity", "can you provide papers relating to scam calls?")
     
     # refine query doesn't require a previous prompt
     print("testing refine query.")
-    response = await run_agent("cybersecurity", "these papers are not interesting enough. can you provide the latest information security papers? use the research_paper_refine_tool", stream=True)
+    print("user: these papers are not interesting enough. can you provide the latest most interesting security papers? use the research_paper_refine_tool")
+    refined_response = await run_agent("information security", "these papers are not interesting enough. can you provide the latest most interesting security papers? use the research_paper_refine_tool", stream=True)
     
     #response2 = await run_agent("african elephants") # something irrelevant to test refinement functions
-    print(str(response))
+    #print(str(response))
 
 
-asyncio.run(main()) # asyncio can only be used once I think
+# Remove asyncio.run() - this was causing the event loop conflict
+# The main() function can be called directly if needed for testing:
+if __name__ == "__main__":
+    asyncio.run(main()) # asyncio could only be called once!!

@@ -1,0 +1,16 @@
+# ml
+arxiv
+llama-index
+llama-index-embeddings-mistralai
+llama-index-llms-mistralai
+
+# databases
+llama-index-storage-chat-store-postgres
+psycopg2
+sqlalchemy
+
+# integration
+uuid
+typing
+fastapi
+uvicorn

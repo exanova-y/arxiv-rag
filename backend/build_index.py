@@ -6,6 +6,10 @@ from llama_index.core.tools import FunctionTool, QueryEngineTool
 import os
 from dotenv import load_dotenv
 
+import psycopg2
+from sqlalchemy import make_url
+from llama_index.vector_stores.postgres import PGVectorStore
+
 
 # define paper download
 def fetch_arxiv_papers(title :str, papers_count: int):
@@ -65,7 +69,6 @@ def create_documents_from_papers(papers):
     return documents
 
 
-# Only execute when run directly, not when imported
 if __name__ == "__main__":
     print("loading environment variables...")
     load_dotenv()
@@ -76,21 +79,65 @@ if __name__ == "__main__":
     embed_model = MistralAIEmbedding(model_name=model_name, api_key=mistral_api_key)
     print("llm and embedding model set up.")
 
-    papers = fetch_arxiv_papers("information security", 50)
-    print("number of papers fetched:", len(papers))
-    documents = create_documents_from_papers(papers)
+    paper_categories = ["computer vision", "machine learning", "software engineering", "information security", "data science"]
+    all_documents = []
+    all_papers = []
+    
+    for category in paper_categories:
+        papers = fetch_arxiv_papers(category, 50)
+        documents = create_documents_from_papers(papers)
+        all_documents.extend(documents)
+        all_papers.extend(papers)
+        print(f"number of papers fetched for {category}: {len(papers)}")
+
+    print(f"Total papers collected: {len(all_papers)}")
+    
+    # uncomment to download single-category paper
+    # papers = fetch_arxiv_papers("computer vision", 5)
+    # documents = create_documents_from_papers(papers)
+    # print(f"number of papers fetched for computer vision: {len(papers)}")
+
     print("documents created.")
-    print([[p['title']] for p in papers])
+    print([[p['title']] for p in all_papers])
 
     print("defining chunk settings")
     Settings.chunk_size = 1024 # the specified maximum num characters per text chunk
     Settings.chunk_overlap = 50 # (specified) maximum num characters of overlap between chunks
-    index = VectorStoreIndex.from_documents(documents, embed_model=embed_model)
+    
+    connection_string = "postgresql://postgres:password@localhost:5432"
+    db_name = "arxiv_rag"
+    conn = psycopg2.connect(connection_string)
+    conn.autocommit = True  
+    url = make_url(connection_string)
 
-    # store the index to avoid re-indexing. 
-    # for now, just store thtese indices locally inside a dir.
-    print("storing indices")
-    index.storage_context.persist('index/') # saves indices locally
-    storage_context = StorageContext.from_defaults(persist_dir='index/')
-    index = load_index_from_storage(storage_context, embed_model=embed_model)
-    print(index)
+    vector_store = PGVectorStore.from_params(
+        database=db_name,
+        host=url.host,
+        password=url.password,
+        port=url.port,
+        user=url.username,
+        table_name="arxiv_papers",
+        embed_dim=1024,  # Mistral embedding dimension
+        hnsw_kwargs={
+            "hnsw_m": 16, # number of neighbors each node links to
+            "hnsw_ef_construction": 64, # how much effort to spend building the index (higher = slower build, better quality).
+            "hnsw_ef_search": 40, # how much effort to spend searching (higher = slower queries, more accurate).
+            "hnsw_dist_method": "vector_cosine_ops", # cosine similarity
+        },
+    )
+
+    print("creating postgresql index")
+    storage_context = StorageContext.from_defaults(vector_store=vector_store) # creates a context with vector_store configs.
+    index = VectorStoreIndex.from_documents(all_documents, storage_context=storage_context, embed_model=embed_model, show_progress=True) # creates the actual vector index from docs
+    
+
+    # uncomment to use local storage
+
+    # index = VectorStoreIndex.from_documents(documents, embed_model=embed_model)
+    # # store the index to avoid re-indexing. 
+    # # for now, just store thtese indices locally inside a dir.
+    # print("storing indices")
+    # index.storage_context.persist('index/') # saves indices locally
+    # storage_context = StorageContext.from_defaults(persist_dir='index/')
+    # index = load_index_from_storage(storage_context, embed_model=embed_model)
+    # print(index)

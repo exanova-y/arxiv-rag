@@ -6,15 +6,17 @@ from llama_index.core.tools import FunctionTool, QueryEngineTool
 from llama_index.core.agent.workflow import ReActAgent # the import source has changed
 from llama_index.core.workflow import Context
 
-import os 
-import requests
+import os
+from pathlib import Path
 from dotenv import load_dotenv
 import asyncio
+import requests
 
 from rich.console import Console
 from rich.markdown import Markdown
 
-from build_index import fetch_arxiv_tool
+from .build_index import fetch_arxiv_tool
+from .database.setup_chat_storage import chat_memory
 
 def download_pdf(pdf_url, output_file):
     response = requests.get(pdf_url)
@@ -49,9 +51,21 @@ llm = MistralAI(api_key=mistral_api_key, model='mistral-large-latest')
 model_name = "mistral-embed"
 embed_model = MistralAIEmbedding(model_name=model_name, api_key=mistral_api_key)
 
+
 print("loading index")
-storage_context = StorageContext.from_defaults(persist_dir='index/')
+
+# Uncomment to use local index
+# Use relative path from current file location
+current_dir = Path(__file__).parent
+index_dir = current_dir.parent / 'index'
+storage_context = StorageContext.from_defaults(persist_dir=str(index_dir))
 index = load_index_from_storage(storage_context, embed_model=embed_model)
+
+# # Or, use PostgreSQL
+# storage_context = StorageContext.from_defaults(vector_store=vector_store)
+# index = VectorStoreIndex.from_vector_store(vector_store=vector_store, embed_model=embed_model)
+
+
 
 print("building query engine")
 query_engine = index.as_query_engine(llm=llm, similarity_top_k=5)
@@ -81,9 +95,8 @@ print("building a 'Reasoning and Acting' agent which has 4 tools")
 # Reasoning: Upon receiving a query, the agent evaluates whether it has enough information to answer directly or if it needs to use a tool.
 # Acting: If the agent decides to use a tool, it executes the tool and then returns to the Reasoning stage to determine whether it can now answer the query or if further tool usage is necessary.
 
-agent = ReActAgent(tools=[download_pdf_tool, rag_tool, rag_tool_refine, fetch_arxiv_tool], llm=llm, verbose=True)
+agent = ReActAgent(tools=[download_pdf_tool, rag_tool, rag_tool_refine, fetch_arxiv_tool], llm=llm, verbose=True, memory=chat_memory)
 ctx = Context(agent)
 
 if __name__ == "__main__":
-    agent = ReActAgent(tools=[download_pdf_tool, rag_tool, rag_tool_refine, fetch_arxiv_tool], llm=llm, verbose=True)
-    ctx = Context(agent)
+    print("build_query_engine ready. Tools: research_paper_query_engine_tool, research_paper_refine_tool, fetch_arxiv_tool")
