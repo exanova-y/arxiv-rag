@@ -7,7 +7,9 @@ Screenshot:
 ![](example.png)
 
 ### Setup
-To be added
+
+How to use:
+
 
 ### Backend
 **Agents-stuff:**
