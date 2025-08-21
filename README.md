@@ -11,13 +11,15 @@ Screenshot:
 How to use:
 ```
 cd frontend
-npm ci && npm run build
-npm run start
+yarn install
+yarn build
+yarn start
 ```
 
 open separate terminal
 ```
 cd backend
+uv venv
 uv pip install -r requirements.txt
 uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
