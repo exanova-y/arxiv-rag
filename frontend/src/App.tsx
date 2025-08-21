@@ -7,11 +7,18 @@ import {
   ChatSection,
   useChatUI,
 } from '@llamaindex/chat-ui'
-import { UIMessage, useChat } from '@ai-sdk/react' // useChat is a hook that manages the chat state (variable)
-import { DefaultChatTransport } from 'ai'
+// AI SDK v5: useChat from '@ai-sdk/react' and UIMessage types from 'ai'
+import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport, type UIMessage as CoreUIMessage, type UIDataTypes, type UITools } from 'ai'
 import CustomCanvas from './components/customCanvas'
 
-const initialMessages: UIMessage[] = [
+// Define your custom message type once
+type MyMetadata = { queryId?: string }
+type MyDataParts = UIDataTypes
+type MyTools = UITools
+export type MyUIMessage = CoreUIMessage<MyMetadata, MyDataParts, MyTools>
+
+const initialMessages: MyUIMessage[] = [
   {
     id: '5',
     role: 'assistant',
@@ -43,12 +50,12 @@ export default function App(): JSX.Element {
 }
 
 function ChatExample() {
-  const handler = useChat({
+  const handler = useChat<MyUIMessage>({
     transport: new DefaultChatTransport({
       api: 'http://localhost:8000/api/chat',
     }),
     messages: initialMessages,
-    onFinish: (message) => {  // this is a callback function triggered when the assistant completes a response 
+    onFinish: (message: MyUIMessage) => { // callback when the assistant sends a message
       console.log('Received message:', message)
     }
   })
