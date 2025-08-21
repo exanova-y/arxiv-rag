@@ -2,8 +2,13 @@ import pandas as pd
 from tabulate import tabulate
 from sqlalchemy import create_engine, text
 
+
+db_url = os.getenv("DATABASE_URL")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+
 # Create SQLAlchemy engine
-engine = create_engine("postgresql://postgres:password@localhost:5432/arxiv_rag")
+engine = create_engine(db_url)
 
 # section 1: paper storage
 # Query first 5 rows with all original columns

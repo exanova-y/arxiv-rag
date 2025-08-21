@@ -1,9 +1,19 @@
+import os
 from llama_index.storage.chat_store.postgres import PostgresChatStore
 from llama_index.core.memory import ChatMemoryBuffer
 
-# using the same db, but creating separate tables
+# Grab from environment
+db_url = os.getenv("DATABASE_URL")
+
+# Railway sometimes gives "postgres://", but SQLAlchemy / asyncpg need "postgresql+asyncpg://"
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+# Under the hood it uses SQLAlchemy async, so it does need postgresql+asyncpg://...???
+
+
+# Create chat store with Railway DB
 chat_store = PostgresChatStore.from_uri(
-    uri="postgresql+asyncpg://postgres:password@127.0.0.1:5432/arxiv_rag",
+    uri=db_url,
 )
 
 chat_memory = ChatMemoryBuffer.from_defaults(
@@ -11,5 +21,3 @@ chat_memory = ChatMemoryBuffer.from_defaults(
     chat_store=chat_store,
     chat_store_key="user1",
 )
-
-# I think no persist methods are required.

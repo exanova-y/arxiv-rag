@@ -7,6 +7,7 @@ llama-index-storage-chat-store-postgres
 llama-index-vector-stores-postgres
 
 # databases
+psycopg[binary] # use quotes to install this if fails
 psycopg2-binary
 sqlalchemy
 
