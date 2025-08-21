@@ -5,19 +5,8 @@ from llama_index.core.memory import ChatMemoryBuffer
 
 # Grab from environment
 dotenv.load_dotenv()
-db_url = (
-    os.getenv("DATABASE_URL")
-    or os.getenv("DATABASE_PUBLIC_URL")
-)
-
-# If not provided, build from component vars with sane defaults - railway
-if not db_url:
-    host = os.getenv("PGHOST") or os.getenv("POSTGRES_HOST") or "127.0.0.1"
-    port = os.getenv("PGPORT") or os.getenv("POSTGRES_PORT") or "5432"
-    user = os.getenv("PGUSER") or os.getenv("POSTGRES_USER") or "postgres"
-    password = os.getenv("PGPASSWORD") or os.getenv("POSTGRES_PASSWORD") or "password"
-    database = os.getenv("PGDATABASE") or os.getenv("POSTGRES_DB") or "arxiv_rag"
-    db_url = f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}"
+db_url = os.getenv("DATABASE_URL")
+print(db_url)
 
 # Normalize scheme to async driver expected by LlamaIndex PostgresChatStore
 if db_url.startswith("postgres://"):

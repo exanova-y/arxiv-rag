@@ -6,10 +6,11 @@ from llama_index.core.tools import FunctionTool, QueryEngineTool
 from llama_index.core.agent.workflow import ReActAgent # the import source has changed
 from llama_index.core.workflow import Context
 
+from sqlalchemy import make_url
+from llama_index.vector_stores.postgres import PGVectorStore
+
 import os
-from pathlib import Path
 from dotenv import load_dotenv
-import asyncio
 import requests
 
 from rich.console import Console
@@ -55,16 +56,34 @@ embed_model = MistralAIEmbedding(model_name=model_name, api_key=mistral_api_key)
 
 print("loading index")
 
-# Uncomment to use local index
-# Use relative path from current file location
-current_dir = Path(__file__).parent
-index_dir = current_dir.parent / 'index'
-storage_context = StorageContext.from_defaults(persist_dir=str(index_dir))
-index = load_index_from_storage(storage_context, embed_model=embed_model)
+# Use PostgreSQL PGVectorStore only
+db_url = os.getenv("DATABASE_URL")
+url = make_url(connection_string)
 
-# # Or, use PostgreSQL
-# storage_context = StorageContext.from_defaults(vector_store=vector_store)
-# index = VectorStoreIndex.from_vector_store(vector_store=vector_store, embed_model=embed_model)
+if not db_name:
+    db_name = url.database or "arxiv_rag"
+
+table_name = os.getenv("PGVECTOR_TABLE", "arxiv_papers")
+print(f"Using PGVector table: {table_name} on {url.host}:{url.port}/{db_name}")
+
+vector_store = PGVectorStore.from_params(
+    database=db_name,
+    host=url.host,
+    password=url.password,
+    port=url.port,
+    user=url.username,
+    table_name=table_name,
+    embed_dim=1024,
+    hnsw_kwargs={
+        "hnsw_m": 16,
+        "hnsw_ef_construction": 64,
+        "hnsw_ef_search": 40,
+        "hnsw_dist_method": "vector_cosine_ops",
+    },
+)
+
+storage_context = StorageContext.from_defaults(vector_store=vector_store)
+index = VectorStoreIndex.from_vector_store(vector_store=vector_store, embed_model=embed_model)
 
 
 

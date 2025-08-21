@@ -7,10 +7,8 @@ from llama_index.vector_stores.postgres import PGVectorStore
 from llama_index.embeddings.mistralai import MistralAIEmbedding
 from llama_index.llms.mistralai import MistralAI
 
-import textwrap
 import os
 import psycopg2
-from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import make_url
 
@@ -21,15 +19,15 @@ embed_model = MistralAIEmbedding(model_name="mistral-embed", api_key=mistral_api
 
 # psycopg2 is a PostgreSQL adapter for Python. it's a low-level, direct way to talk to Postgres 
 print("creating db.")
-connection_string = "postgresql://postgres:password@localhost:5432"
+db_url = os.getenv("DATABASE_URL")
 db_name = "arxiv_rag"
-conn = psycopg2.connect(connection_string)
+conn = psycopg2.connect(db_url)
 conn.autocommit = True
 
 # sqlalchemy is a database toolkit for Python. 
 # 1 it has a nice API to build SQL queries programmatically (instead of writing raw strings).
 # 2 it maps python classes to database tables (object-relational mapping).
-url = make_url(connection_string)
+url = make_url(db_url)
 
 # A query is another vector and you want the “closest” ones
 # HNSW is a graph-based algorithm for fast nearest-neighbor search.
@@ -55,7 +53,7 @@ documents = SimpleDirectoryReader(index_path).load_data()
 print(f"Loaded {len(documents)} documents")
 
 # this seems duplicated, may delete soon.
-conn_db = psycopg2.connect(f"{connection_string}/{db_name}")
+conn_db = psycopg2.connect(db_url)
 conn_db.autocommit = True
 with conn_db.cursor() as c:
     c.execute("CREATE EXTENSION IF NOT EXISTS vector;")

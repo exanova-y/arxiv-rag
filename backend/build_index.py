@@ -104,11 +104,12 @@ if __name__ == "__main__":
     Settings.chunk_size = 1024 # the specified maximum num characters per text chunk
     Settings.chunk_overlap = 50 # (specified) maximum num characters of overlap between chunks
     
-    connection_string = "postgresql://postgres:password@localhost:5432"
+
+    db_url = os.getenv("DATABASE_URL")
     db_name = "arxiv_rag"
-    conn = psycopg2.connect(connection_string)
+    conn = psycopg2.connect(db_url)
     conn.autocommit = True  
-    url = make_url(connection_string)
+    url = make_url(db_url)
 
     vector_store = PGVectorStore.from_params(
         database=db_name,
