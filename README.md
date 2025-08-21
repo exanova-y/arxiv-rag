@@ -9,7 +9,9 @@ Screenshot:
 ### Setup
 
 How to use:
-
+cd frontend
+npm ci && npm run build
+npm run start
 
 ### Backend
 **Agents-stuff:**

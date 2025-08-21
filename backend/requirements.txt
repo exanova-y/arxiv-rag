@@ -3,14 +3,17 @@ arxiv
 llama-index
 llama-index-embeddings-mistralai
 llama-index-llms-mistralai
+llama-index-storage-chat-store-postgres
+llama-index-vector-stores-postgres
 
 # databases
-llama-index-storage-chat-store-postgres
-psycopg2
+psycopg2-binary
 sqlalchemy
 
 # integration
-uuid
-typing
 fastapi
 uvicorn
+asyncpg
+python-dotenv
+requests
+rich
