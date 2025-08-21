@@ -3,6 +3,9 @@
 Architecture:
 ![](architecture.png)
 
+Screenshot:
+![](example.png)
+
 ### Setup
 To be added
 
