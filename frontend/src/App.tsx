@@ -7,7 +7,7 @@ import {
   ChatSection,
   useChatUI,
 } from '@llamaindex/chat-ui'
-// AI SDK v5: useChat from '@ai-sdk/react' and UIMessage types from 'ai'
+// AI SDK v5. *significant* updates. useChat from '@ai-sdk/react' and UIMessage types from 'ai'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport, type UIMessage as CoreUIMessage, type UIDataTypes, type UITools } from 'ai'
 import CustomCanvas from './components/customCanvas'
@@ -55,7 +55,7 @@ function ChatExample() {
       api: 'http://localhost:8000/api/chat',
     }),
     messages: initialMessages,
-    onFinish: (message: MyUIMessage) => { // callback when the assistant sends a message
+    onFinish: ({ message }) => {
       console.log('Received message:', message)
     }
   })
