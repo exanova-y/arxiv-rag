@@ -8,26 +8,47 @@ Screenshot:
 
 ### Setup
 
-How to use:
-```
+How to run:
+
+For frontend
+```bash
 cd frontend
 yarn install
 yarn build
 yarn start
 ```
 
-open separate terminal
-```
+Open separate terminal for setting up backend.
+
+```bash
 cd backend
 uv venv
 uv pip install -r requirements.txt
+# make sure postgres is installed on the system. Below is the set up for mac:
+brew services start postgresql
+psql postgres 
+CREATE DATABASE arxiv_rag;
+CREATE USER your_username WITH PASSWORD 'your_password';
+psql -d arxiv_rag -U your_username
+python3 database/setup_paper_storage.py
+python3 database/setup_chat_storage.py
+python3 build_index.py
+# build_query_engine.py is run at import time
+```
+
+Create a .env file in the backend directory and fill in:
+```bash
+DATABASE_URL="postgresql+asyncpg://your_username:your_password@localhost:5432/arxiv_rag" 
+MISTRAL_API_KEY="your_mistral_api_key" 
+PORT=8000
+# now we can start the server
 uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### Backend
 **Agents-stuff:**
 - build_index.py
-- build_query_engine.py 
+- build_query_engine.py (runs at import time)
 - run_agent.py
 
 **Database:**
